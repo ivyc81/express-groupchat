@@ -56,6 +56,22 @@ class ChatUser {
     this.send(JSON.stringify({type: "note", text: result.data.joke}));
   }
 
+  handleMembers() {
+    // get all members
+    const members = this.room.members;
+
+    let membersArr = [];
+
+    members.forEach(function(member) {
+      membersArr.push(member.name)
+    })
+
+    const membersMsg = "In room: " + membersArr.join(', ');
+    
+    // send to client
+    this.send(JSON.stringify({type: "note", text: membersMsg}));
+  }
+
   /** Handle messages from client:
    *
    * - {type: "join", name: username} : join
@@ -69,12 +85,13 @@ class ChatUser {
     else if (msg.type === 'chat') {
       if(msg.text === '/joke'){
         this.handleJoke();
+      } else if (msg.text === '/members'){
+        this.handleMembers();
       } else {
         this.handleChat(msg.text);
       }
     }
     else throw new Error(`bad message: ${msg.type}`);
-
   }
 
   /** Connection was closed: leave room, announce exit to others */
