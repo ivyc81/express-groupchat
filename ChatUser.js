@@ -89,6 +89,15 @@ class ChatUser {
     }
   }
 
+  changeName(text){
+    const arr = text.split(' ');
+    const newName = arr[1];
+    console.log(arr, newName)
+
+    this.name = newName;
+    this.send(JSON.stringify({type: "note", text: `Your name is now ${newName}`}));
+  }
+
   /** Handle messages from client:
    *
    * - {type: "join", name: username} : join
@@ -104,6 +113,8 @@ class ChatUser {
         this.handleJoke();
       } else if (msg.text === '/members'){
         this.handleMembers();
+      } else if (msg.text.startsWith('/name')){
+        this.changeName(msg.text);
       } else if (msg.text.startsWith('/priv')){
         this.handlePriv(msg.text);
       } else {
