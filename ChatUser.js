@@ -51,8 +51,7 @@ class ChatUser {
   async handleJoke() {
     const result = await axios.get('https://icanhazdadjoke.com', {headers:{'Accept':'application/json'}});
 
-    console.log('resultTTTTTT', result.data);
-
+    this.send(JSON.stringify({type: "note", text: '/joke'}));
     this.send(JSON.stringify({type: "note", text: result.data.joke}));
   }
 
@@ -67,9 +66,27 @@ class ChatUser {
     })
 
     const membersMsg = "In room: " + membersArr.join(', ');
-    
+
     // send to client
     this.send(JSON.stringify({type: "note", text: membersMsg}));
+  }
+
+  handlePriv(text) {
+    //parse text to get username and message
+    const arr = text.split(' ');
+    const [a, username, ...rest] = arr;
+    const message = rest.join(' ');
+
+    //send message to username
+    const members = this.room.members;
+    for(let member of members){
+      if(member.name === username){
+        const res = JSON.stringify({type: "chat", name: this.name, text: message })
+        this.send(res);
+        member.send(res);
+        break;
+      }
+    }
   }
 
   /** Handle messages from client:
@@ -87,6 +104,8 @@ class ChatUser {
         this.handleJoke();
       } else if (msg.text === '/members'){
         this.handleMembers();
+      } else if (msg.text.startsWith('/priv')){
+        this.handlePriv(msg.text);
       } else {
         this.handleChat(msg.text);
       }

@@ -4,8 +4,10 @@ const urlParts = document.URL.split("/");
 const roomName = urlParts[urlParts.length - 1];
 const ws = new WebSocket(`ws://localhost:3000/chat/${roomName}`);
 
-
-const name = prompt("Username?");
+let name;
+do{
+  name = prompt("Username? please no spaces");
+} while (name.includes(' '))
 
 
 /** called when connection opens, sends join info to server. */
